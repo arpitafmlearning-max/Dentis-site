@@ -1,0 +1,6 @@
+{
+  "name": "PearlCare Dental Studio",
+  "description": "Modern dentistry, gentle care, and confident smiles by Dr. Rohan Mehta in Kalyan West. Comprehensive dental studio with online appointment booking and clinic management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
