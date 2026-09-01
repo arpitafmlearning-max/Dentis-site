@@ -30,6 +30,7 @@ export const AdminAppointments: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(null);
   const [selectedAppointmentForNotes, setSelectedAppointmentForNotes] = useState<Appointment | null>(null);
   const [noteText, setNoteText] = useState('');
 
@@ -68,9 +69,10 @@ export const AdminAppointments: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: string, name: string) => {
-    if (window.confirm(`Are you sure you want to delete the appointment for ${name}?`)) {
-      deleteAppointment(id);
+  const handleConfirmDelete = () => {
+    if (appointmentToDelete) {
+      deleteAppointment(appointmentToDelete.id);
+      setAppointmentToDelete(null);
     }
   };
 
@@ -306,8 +308,8 @@ export const AdminAppointments: React.FC = () => {
                         </a>
 
                         <button
-                          onClick={() => handleDelete(apt.id, apt.patientName)}
-                          className="p-2 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors"
+                          onClick={() => setAppointmentToDelete(apt)}
+                          className="p-2 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
                           title="Delete appointment"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -322,22 +324,72 @@ export const AdminAppointments: React.FC = () => {
         </div>
       </div>
 
+      {/* Delete Confirmation Modal */}
+      {appointmentToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#E2E8F0] space-y-4 animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center gap-3 text-rose-600">
+              <div className="w-10 h-10 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="font-serif font-bold text-lg text-[#1A2A44]">
+                  Delete Appointment?
+                </h3>
+                <p className="text-xs text-slate-500 font-light">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#F8FAFC] p-3.5 rounded-2xl border border-[#E2E8F0] space-y-1 text-xs">
+              <p className="font-bold text-slate-800">
+                Patient: <span className="font-normal text-slate-600">{appointmentToDelete.patientName}</span>
+              </p>
+              <p className="font-bold text-slate-800">
+                Treatment: <span className="font-normal text-slate-600">{appointmentToDelete.treatment}</span>
+              </p>
+              <p className="font-bold text-slate-800">
+                Slot: <span className="font-normal text-slate-600">{appointmentToDelete.preferredDate} ({appointmentToDelete.preferredTime})</span>
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setAppointmentToDelete(null)}
+                className="px-4 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="px-5 py-2.5 text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white rounded-xl shadow-xs transition-colors cursor-pointer"
+              >
+                Yes, Delete Appointment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Clinical Notes Modal */}
       {selectedAppointmentForNotes && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#E8E5DF] space-y-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#E2E8F0] space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-serif font-bold text-lg text-[#0B192C]">
+                <h3 className="font-serif font-bold text-lg text-[#1A2A44]">
                   Internal Patient Notes
                 </h3>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-slate-500 font-light">
                   {selectedAppointmentForNotes.patientName} • {selectedAppointmentForNotes.treatment}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedAppointmentForNotes(null)}
-                className="p-1 text-slate-400 hover:text-slate-700"
+                className="p-1 text-slate-400 hover:text-slate-700 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -348,21 +400,21 @@ export const AdminAppointments: React.FC = () => {
               placeholder="e.g. Patient mentioned mild sensitivity on lower molar. Confirmed 4 PM slot via WhatsApp call."
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
-              className="w-full p-3 bg-[#FAF9F6] border border-[#E8E5DF] rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0D5C63]/20 resize-none"
+              className="w-full p-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0D9488]/20 resize-none"
             />
 
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => setSelectedAppointmentForNotes(null)}
-                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl"
+                className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleSaveNotes}
-                className="px-4 py-2 text-xs font-semibold bg-[#0D5C63] hover:bg-[#0B4A50] text-white rounded-xl shadow-xs"
+                className="px-4 py-2 text-xs font-semibold bg-[#0D9488] hover:bg-[#0F766E] text-white rounded-xl shadow-xs cursor-pointer"
               >
                 Save Notes
               </button>

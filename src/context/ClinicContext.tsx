@@ -314,18 +314,48 @@ export const ClinicProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return true;
   };
 
-  const updateAppointmentStatus = (id: string, status: AppointmentStatus) => {
+  const updateAppointmentStatus = async (id: string, status: AppointmentStatus) => {
     setAppointmentsState(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+    if (settings.isSupabaseEnabled && settings.supabaseUrl && settings.supabaseAnonKey) {
+      try {
+        const client = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey);
+        if (client) {
+          await client.from('appointments').update({ status }).eq('id', id);
+        }
+      } catch (err) {
+        console.warn('Supabase status update error:', err);
+      }
+    }
     addToast({ type: 'success', title: 'Status Updated', message: `Appointment status set to ${status}.` });
   };
 
-  const updateAppointmentNotes = (id: string, notes: string) => {
+  const updateAppointmentNotes = async (id: string, notes: string) => {
     setAppointmentsState(prev => prev.map(a => a.id === id ? { ...a, notes } : a));
+    if (settings.isSupabaseEnabled && settings.supabaseUrl && settings.supabaseAnonKey) {
+      try {
+        const client = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey);
+        if (client) {
+          await client.from('appointments').update({ notes }).eq('id', id);
+        }
+      } catch (err) {
+        console.warn('Supabase notes update error:', err);
+      }
+    }
     addToast({ type: 'success', title: 'Notes Saved', message: 'Internal patient note recorded.' });
   };
 
-  const deleteAppointment = (id: string) => {
+  const deleteAppointment = async (id: string) => {
     setAppointmentsState(prev => prev.filter(a => a.id !== id));
+    if (settings.isSupabaseEnabled && settings.supabaseUrl && settings.supabaseAnonKey) {
+      try {
+        const client = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey);
+        if (client) {
+          await client.from('appointments').delete().eq('id', id);
+        }
+      } catch (err) {
+        console.warn('Supabase delete error for appointment:', err);
+      }
+    }
     addToast({ type: 'info', title: 'Appointment Removed', message: 'Appointment record deleted.' });
   };
 
@@ -370,18 +400,48 @@ export const ClinicProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return true;
   };
 
-  const updateEnquiryStatus = (id: string, status: EnquiryStatus) => {
+  const updateEnquiryStatus = async (id: string, status: EnquiryStatus) => {
     setEnquiriesState(prev => prev.map(e => e.id === id ? { ...e, status } : e));
+    if (settings.isSupabaseEnabled && settings.supabaseUrl && settings.supabaseAnonKey) {
+      try {
+        const client = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey);
+        if (client) {
+          await client.from('enquiries').update({ status }).eq('id', id);
+        }
+      } catch (err) {
+        console.warn('Supabase enquiry status update error:', err);
+      }
+    }
     addToast({ type: 'success', title: 'Enquiry Updated', message: `Lead status marked as ${status}.` });
   };
 
-  const updateEnquiryNotes = (id: string, notes: string) => {
+  const updateEnquiryNotes = async (id: string, notes: string) => {
     setEnquiriesState(prev => prev.map(e => e.id === id ? { ...e, notes } : e));
+    if (settings.isSupabaseEnabled && settings.supabaseUrl && settings.supabaseAnonKey) {
+      try {
+        const client = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey);
+        if (client) {
+          await client.from('enquiries').update({ notes }).eq('id', id);
+        }
+      } catch (err) {
+        console.warn('Supabase enquiry notes update error:', err);
+      }
+    }
     addToast({ type: 'success', title: 'Note Saved', message: 'Enquiry internal note recorded.' });
   };
 
-  const deleteEnquiry = (id: string) => {
+  const deleteEnquiry = async (id: string) => {
     setEnquiriesState(prev => prev.filter(e => e.id !== id));
+    if (settings.isSupabaseEnabled && settings.supabaseUrl && settings.supabaseAnonKey) {
+      try {
+        const client = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey);
+        if (client) {
+          await client.from('enquiries').delete().eq('id', id);
+        }
+      } catch (err) {
+        console.warn('Supabase delete error for enquiry:', err);
+      }
+    }
     addToast({ type: 'info', title: 'Enquiry Removed', message: 'Lead record deleted.' });
   };
 
